@@ -8,6 +8,8 @@
     "dev": "cross-env NODE_ENV=development nodemon app",
     "postinstall": "node ./scripts/post-install.js",
     "test": "echo \"No test specified\" && exit 0"
+    "build": "echo 'Building project...'"
+
   },
   "author": "Brad Traversy",
   "license": "MIT",
