@@ -1,0 +1,72 @@
+pipeline {
+    agent any  // Run the pipeline on any available agent
+    
+    environment {
+        GIT_REPO_URL = 'https://github.com/bradtraversy/storybooks.git'
+        BRANCH_NAME = 'main'  // The branch to build (default: main)
+        S3_BUCKET_NAME = 'your-s3-bucket-name'  // Replace with your S3 bucket name
+        REGION = 'us-east-1'  // Set the AWS region where your bucket is located
+    }
+    
+    stages {
+        stage('Checkout Code') {
+            steps {
+                // Pull the code from GitHub
+                git url: "${GIT_REPO_URL}", branch: "${BRANCH_NAME}"
+            }
+        }
+        
+        stage('Install Dependencies') {
+            steps {
+                // Install dependencies using npm
+                sh 'npm install'
+            }
+        }
+        
+        stage('Run Tests') {
+            steps {
+                // Run tests if any are defined in package.json
+                echo 'Running tests...'
+                sh 'npm test'  // Adjust if your project uses a different testing tool
+            }
+        }
+        
+        stage('Build') {
+            steps {
+                // Run the build command (to generate the static files for Storybook)
+                echo 'Building the project...'
+                sh 'npm run build'
+            }
+        }
+        
+        stage('Deploy to AWS S3') {
+            steps {
+                script {
+                    withCredentials([usernamePassword(credentialsId: 'aws-credentials-id', usernameVariable: 'AWS_ACCESS_KEY_ID', passwordVariable: 'AWS_SECRET_ACCESS_KEY')]) {
+                        // Sync the generated build folder to S3
+                        echo 'Deploying to AWS S3...'
+                        sh '''
+                            aws s3 sync ./storybook-static/ s3://${S3_BUCKET_NAME}/ --delete --region ${REGION}
+                        '''
+                    }
+                }
+            }
+        }
+    }
+    
+    post {
+        always {
+            // Actions to perform after the pipeline (e.g., notifications)
+            echo 'Pipeline execution completed.'
+        }
+        
+        success {
+            echo 'Pipeline completed successfully!'
+        }
+        
+        failure {
+            echo 'Pipeline failed.'
+        }
+    }
+}
+
