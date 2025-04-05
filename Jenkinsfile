@@ -37,7 +37,7 @@ pipeline {
                     npm install
                     pm2 delete all || true
                     pm2 start app.js
-                    EOF
+EOF
                     '''
                 }
             }
