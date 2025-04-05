@@ -47,6 +47,7 @@ EOF
         stage('Show App URL') {
             steps {
                 echo "✅ Your app is running at: http://$EC2_PUBLIC_IP:$APP_PORT"
+                //comment
             }
         }
     }
