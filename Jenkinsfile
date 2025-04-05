@@ -12,7 +12,7 @@ pipeline {
     stages {
         stage('Clone Repo') {
             steps {
-                git credentialsId: 'github-creds', url: 'https://github.com/your-username/Jenkins_project.git'
+                git credentialsId: 'github-creds', url: 'https://github.com/alishasaiyed7/Jenkins_project.git'
             }
         }
 
