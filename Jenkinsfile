@@ -28,7 +28,7 @@ pipeline {
             steps {
                 sshagent(['ec2-ssh-key']) {
                     sh '''
-                    ssh -o StrictHostKeyChecking=no ubuntu@18.212.231.42 << 'EOF'
+                    ssh -o StrictHostKeyChecking=no -i ~/Jenkins_erver.pem ubuntu@18.212.231.42 << 'EOF'
                     if [ ! -d "Jenkins_project" ]; then
                         git clone https://github.com/alishasaiyed7/Jenkins_project.git
                     fi
