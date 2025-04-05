@@ -3,6 +3,8 @@ pipeline {
 
     environment {
         MONGO_URI = credentials('MONGO_URI') // Mongo URI from Jenkins credentials
+        EC2_PUBLIC_IP = '18.212.231.42' // Replace with your deployed EC2 public IP
+        APP_PORT = '3000'
     }
 
     stages {
@@ -40,6 +42,11 @@ pipeline {
 EOF
                     '''
                 }
+            }
+        }
+        stage('Show App URL') {
+            steps {
+                echo "✅ Your app is running at: http://$EC2_PUBLIC_IP:$APP_PORT"
             }
         }
     }
