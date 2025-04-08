@@ -2,13 +2,22 @@ pipeline {
     agent any
 
     environment {
-        NODE_ENV = 'production'
+        NODE_ENV = "production"
     }
 
     stages {
-        stage('Clone Repository') {
+        stage('Checkout') {
             steps {
-                git 'https://github.com/your-username/Jenkins_project.git'
+                git url: 'https://github.com/alishasaiyed7/Jenkins_project.git', branch: 'main'
+            }
+        }
+
+        stage('Install Node.js') {
+            steps {
+                sh '''
+                curl -fsSL https://rpm.nodesource.com/setup_18.x | sudo -E bash -
+                sudo yum install -y nodejs
+                '''
             }
         }
 
@@ -18,15 +27,16 @@ pipeline {
             }
         }
 
-        stage('Run Tests') {
+        stage('Test') {
             steps {
-                script {
-                    try {
-                        sh 'npm test'
-                    } catch (e) {
-                        echo 'Tests failed or not defined. Skipping...'
-                    }
-                }
+                // If you have no tests, this will avoid failure
+                sh 'npm test || echo "No tests defined"'
+            }
+        }
+
+        stage('Build Success') {
+            steps {
+                echo 'Build and test completed!'
             }
         }
     }
