@@ -1,43 +1,30 @@
 pipeline {
     agent any
 
-    environment {
-        NODE_ENV = "production"
+    stages {
+        stage('Pull Latest Code') {
+            steps {
+                git 'https://github.com/your-username/Jenkins_project.git'
+            }
+        }
+
+        stage('Deploy to EC2') {
+            steps {
+                sshagent(credentials: ['your-ec2-ssh-key']) {
+                    sh '''
+                    ssh ec2-user@54.163.202.164 'cd /home/ec2-user/app && git pull origin main && pm2 restart app'
+                    '''
+                }
+            }
+        }
     }
 
-    stages {
-        stage('Checkout') {
-            steps {
-                git url: 'https://github.com/alishasaiyed7/Jenkins_project.git', branch: 'main'
-            }
+    post {
+        success {
+            echo '✅ Code updated and app restarted!'
         }
-
-        stage('Install Node.js') {
-            steps {
-                sh '''
-                curl -fsSL https://rpm.nodesource.com/setup_18.x | sudo -E bash -
-                sudo yum install -y nodejs
-                '''
-            }
-        }
-
-        stage('Install Dependencies') {
-            steps {
-                sh 'npm install'
-            }
-        }
-
-        stage('Test') {
-            steps {
-                // If you have no tests, this will avoid failure
-                sh 'npm test || echo "No tests defined"'
-            }
-        }
-
-        stage('Build Success') {
-            steps {
-                echo 'Build and test completed!'
-            }
+        failure {
+            echo '❌ Deployment failed.'
         }
     }
 }
